@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd D:\\akcc && npm run lint --silent 2>&1 | head -20 && npx tsc --noEmit 2>&1 | head -20",
+            "description": "Lint + type-check after every file edit"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,26 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand colours */
+  --bg:            #F2F7FB;
+  --surface:       #E4EFF8;
+  --sky-2:         #D7E9F6;
+  --card:          #FFFFFF;
+  --primary:       #2479C2;
+  --primary-deep:  #1C5F9C;
+  --primary-tint:  #E1EEF9;
+  --ink:           #173A5E;
+  --body:          #45596B;
+  --muted:         #8194A6;
+  --border:        #DCE7F0;
+  --accent:        #E0A03A;
+  --accent-deep:   #B97E1E;
+
+  /* Radii */
+  --r-sm:   10px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-pill: 999px;
+
+  /* Shadow */
+  --shadow: 0 1px 3px rgba(23,58,94,0.04);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg:            var(--bg);
+  --color-surface:       var(--surface);
+  --color-sky-2:         var(--sky-2);
+  --color-card:          var(--card);
+  --color-primary:       var(--primary);
+  --color-primary-deep:  var(--primary-deep);
+  --color-primary-tint:  var(--primary-tint);
+  --color-ink:           var(--ink);
+  --color-body:          var(--body);
+  --color-muted:         var(--muted);
+  --color-border:        var(--border);
+  --color-accent:        var(--accent);
+  --color-accent-deep:   var(--accent-deep);
+
+  --font-heading: "Plus Jakarta Sans", sans-serif;
+  --font-sans:    "Inter", sans-serif;
+
+  --radius-sm:   var(--r-sm);
+  --radius-md:   var(--r-md);
+  --radius-lg:   var(--r-lg);
+  --radius-pill: var(--r-pill);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--body);
+  font-family: "Inter", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
