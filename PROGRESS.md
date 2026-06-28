@@ -14,28 +14,42 @@
 - `.env.local.example` updated with `TRIGGER_SECRET_KEY` + `TRIGGER_PROJECT_REF`
 - `package.json` scripts added: `trigger:dev`, `trigger:deploy`
 
-### Steps to complete end-to-end confirmation ⛔
-1. Go to [cloud.trigger.dev](https://cloud.trigger.dev) → create a free account/project
-2. Copy your **Project Ref** (looks like `proj_xxxxxxxx`) and paste it into `trigger.config.ts` line 4
-3. Copy your **Secret Key** (looks like `tr_dev_xxxxxxxx`) and add to `.env.local`:
-   ```
-   TRIGGER_SECRET_KEY=tr_dev_...
-   ```
-4. Also add both to Vercel env vars (Project → Settings → Environment Variables)
-5. Run locally: `npm run trigger:dev` — confirm `hello-world` shows in dashboard
-6. Deploy: `npm run trigger:deploy`
-7. Trigger it once from the dashboard to confirm end-to-end run
-
-### ⛔ Need from you
-- Trigger.dev **Project Ref** (to update `trigger.config.ts`)
-- Trigger.dev **Secret Key** (to add to `.env.local` + Vercel)
-
-Reply with both values and I'll plug them in, run deploy, and complete the end-to-end check.
+### ⛔ Still needed to complete end-to-end
+1. Go to [cloud.trigger.dev](https://cloud.trigger.dev) → create free account + project
+2. Copy **Project Ref** (`proj_xxxxxxxx`) → paste into `trigger.config.ts` line 4
+3. Copy **Secret Key** (`tr_dev_xxxxxxxx`) → add to `.env.local` as `TRIGGER_SECRET_KEY`
+4. Add both to Vercel env vars
+5. Run `npm run trigger:dev` locally → confirm `hello-world` shows in dashboard
+6. Run `npm run trigger:deploy`
 
 ---
 
-## Day 2 — `event-reminder` 🔨 (not started)
-Trigger.dev schedule: 24h before an event, email every RSVPd member.
+## Day 2 — `event-reminder` ✅
+
+### What shipped
+- Installed `resend` v6 package
+- `supabase/migrations/20240101000004_event_reminder.sql` — adds `reminder_sent_at TIMESTAMPTZ` + partial index to `events`
+- `src/lib/email.ts` — server-only Resend singleton + FROM_ADDRESS helper
+- `src/trigger/event-reminder.ts` — `schedules.task` (id: `event-reminder`)
+  - Cron: `0 * * * *` in `Australia/Melbourne` timezone
+  - Window: events starting 23–25 h from now, `reminder_sent_at IS NULL`
+  - Idempotency: marks `reminder_sent_at` BEFORE sending (at-most-once, no spam)
+  - Retries: 3 attempts, exponential backoff 5s → 30s
+  - HTML-escapes all admin-provided fields before inserting into email
+  - Sends batch via Resend; logs errors per-event without crashing
+
+### ⛔ Need from you
+1. **Resend account** — [resend.com](https://resend.com) → free plan is fine
+2. Verify your sending domain (or use Resend's sandbox `onboarding@resend.dev` for testing)
+3. Add to `.env.local` and Vercel env vars:
+   ```
+   RESEND_API_KEY=re_...
+   RESEND_FROM_EMAIL=AKCC <no-reply@yourdomain.com>
+   ```
+4. Add same vars to Trigger.dev dashboard → project → environment variables
+5. Run migration against your Supabase project: `supabase db push` (or apply via Supabase dashboard SQL editor)
+
+---
 
 ## Day 3 — `giving-statement` ⏭️
 On-demand PDF + email for year-end giving statement.
