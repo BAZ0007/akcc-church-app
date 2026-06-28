@@ -128,11 +128,20 @@
     "fund": "Fund",
     "amount": "Amount",
     "date": "Date",
-    "donor": "Donor"
+    "donor": "Donor",
+    "givingStatements": "Year-End Giving Statements",
+    "givingStatementsSubtitle": "Generate and email a giving statement PDF to a member.",
+    "selectMember": "Select member",
+    "statementYear": "Year",
+    "sendStatement": "Send Statement",
+    "confirmStatement": "Send the {year} giving statement to {name}?",
+    "statementSent": "Statement sent! The member will receive a PDF by email shortly.",
+    "givingStatementsNav": "Giving Statements"
   },
   "common": {
     "loading": "Loading…",
     "error": "Something went wrong. Please try again.",
+    "confirm": "Confirm",
     "notFound": "Page not found.",
     "backHome": "Back to Home",
     "close": "Close",

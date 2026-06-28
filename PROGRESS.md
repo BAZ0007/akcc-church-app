@@ -14,48 +14,45 @@
 - `.env.local.example` updated with `TRIGGER_SECRET_KEY` + `TRIGGER_PROJECT_REF`
 - `package.json` scripts added: `trigger:dev`, `trigger:deploy`
 
-### ⛔ Still needed to complete end-to-end
-1. Go to [cloud.trigger.dev](https://cloud.trigger.dev) → create free account + project
-2. Copy **Project Ref** (`proj_xxxxxxxx`) → paste into `trigger.config.ts` line 4
-3. Copy **Secret Key** (`tr_dev_xxxxxxxx`) → add to `.env.local` as `TRIGGER_SECRET_KEY`
-4. Add both to Vercel env vars
-5. Run `npm run trigger:dev` locally → confirm `hello-world` shows in dashboard
-6. Run `npm run trigger:deploy`
+### ⛔ Still needed
+- Trigger.dev **Project Ref** → paste into `trigger.config.ts` line 4
+- Trigger.dev **Secret Key** → add to `.env.local` + Vercel + Trigger.dev env vars
 
 ---
 
 ## Day 2 — `event-reminder` ✅
 
 ### What shipped
-- Installed `resend` v6 package
-- `supabase/migrations/20240101000004_event_reminder.sql` — adds `reminder_sent_at TIMESTAMPTZ` + partial index to `events`
-- `src/lib/email.ts` — server-only Resend singleton + FROM_ADDRESS helper
-- `src/trigger/event-reminder.ts` — `schedules.task` (id: `event-reminder`)
-  - Cron: `0 * * * *` in `Australia/Melbourne` timezone
-  - Window: events starting 23–25 h from now, `reminder_sent_at IS NULL`
-  - Idempotency: marks `reminder_sent_at` BEFORE sending (at-most-once, no spam)
-  - Retries: 3 attempts, exponential backoff 5s → 30s
-  - HTML-escapes all admin-provided fields before inserting into email
-  - Sends batch via Resend; logs errors per-event without crashing
+- `resend` v6 installed
+- Migration `20240101000004_event_reminder.sql` — `reminder_sent_at` + partial index on `events`
+- `src/lib/email.ts` — server-only Resend singleton
+- `src/trigger/event-reminder.ts` — hourly cron (Melbourne TZ), 23-25h window, idempotency guard, HTML-escaped, 3 retries
 
-### ⛔ Need from you
-1. **Resend account** — [resend.com](https://resend.com) → free plan is fine
-2. Verify your sending domain (or use Resend's sandbox `onboarding@resend.dev` for testing)
-3. Add to `.env.local` and Vercel env vars:
-   ```
-   RESEND_API_KEY=re_...
-   RESEND_FROM_EMAIL=AKCC <no-reply@yourdomain.com>
-   ```
-4. Add same vars to Trigger.dev dashboard → project → environment variables
-5. Run migration against your Supabase project: `supabase db push` (or apply via Supabase dashboard SQL editor)
+### ⛔ Still needed
+- Resend account + verified domain → `RESEND_API_KEY` + `RESEND_FROM_EMAIL` in `.env.local`, Vercel, Trigger.dev env vars
+- Run migration in Supabase
 
 ---
 
-## Day 3 — `giving-statement` ⏭️
-On-demand PDF + email for year-end giving statement.
+## Day 3 — `giving-statement` ✅
+
+### What shipped
+- `pdfkit` installed (+ `@types/pdfkit`)
+- `src/trigger/giving-statement.ts` — on-demand task
+  - Fetches completed givings for a member+year (service role)
+  - Generates A4 PDF with donation table + totals (pdfkit)
+  - Emails PDF attachment via Resend; 3 retries
+  - HTML-escapes member name in email body
+- `src/app/api/admin/giving/statement/route.ts` — admin-only POST; validates userId+year, triggers task
+- `src/app/admin/giving/page.tsx` — admin RSC; fetches member list from profiles
+- `src/app/admin/giving/_components/StatementForm.tsx` — client form: year + member selectors, two-step confirm before send
+- `src/app/admin/layout.tsx` — added "Giving Statements" nav link
+- `src/i18n/dictionaries/en.json` — added giving statement + common.confirm keys
+
+---
 
 ## Day 4 — `prayer-notify` ⏭️
-Fire from prayer-create API → email admin when new prayer request arrives.
+Trigger.dev task fired from prayer-create API → email admin when new prayer request arrives.
 
 ## Day 5 — `weekly-digest` ⏭️
 Sunday AM Melbourne cron → email subscribed members week's sermons + events.
