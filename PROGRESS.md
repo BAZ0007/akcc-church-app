@@ -43,9 +43,12 @@
 - `.env.local.example` updated with `N8N_WEBHOOK_URL` + `N8N_WEBHOOK_SECRET`
 - ⛔ Need: add both vars to `.env.local`, Vercel env vars
 
-## Day 8 — Workflow 1: member signup ⏭️
-Call `emitToN8n("member.signup", {...})` from the signup API route.
-n8n workflow JSON exported to `deploy/n8n/workflows/member-signup.json`.
+## Day 8 — Workflow 1: member signup ✅
+- `src/app/auth/callback/route.ts`: fire-and-forget `emitToN8n("member.signup", { userId, email, fullName })` — detects new signup via `created_at` freshness (< 2 min), not spoofable `type=` param
+- `src/app/(auth)/signup/page.tsx`: added `emailRedirectTo` so Supabase sends confirmation link back to `/auth/callback`
+- `deploy/n8n/workflows/member-signup.json`: importable workflow — webhook → HMAC verify (timing-safe, 5-min replay window) → welcome email + admin notify (parallel, via Resend HTTP Request)
+- `deploy/n8n/.env.example`: added `RESEND_API_KEY`, `N8N_FROM_EMAIL`, `ADMIN_EMAIL` for workflow use
+- ⛔ Need: import `member-signup.json` into n8n, activate workflow, set `N8N_WEBHOOK_URL=https://<n8n-domain>/webhook/akcc` in Vercel
 
 ## Day 9 — Workflows 2 & 3 ⏭️
 Volunteer roster + weekly giving summary workflows.

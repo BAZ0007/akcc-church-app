@@ -1,0 +1,95 @@
+{
+  "name": "AKCC — Member Signup",
+  "nodes": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "On AKCC Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "akcc",
+        "responseMode": "onReceived",
+        "responseData": "noData",
+        "options": {
+          "includeHeaders": true
+        }
+      },
+      "webhookId": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "id": "33333333-3333-3333-3333-333333333333",
+      "name": "Verify Signature + Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// ── HMAC-SHA256 verification + HTML-safe extraction ──────────────────────────\nconst crypto = require('crypto');\n\nconst secret = $env.N8N_WEBHOOK_SECRET;\nif (!secret) throw new Error('N8N_WEBHOOK_SECRET env var is not set');\n\n// With 'Include Headers' enabled the Webhook node wraps body + headers.\nconst raw = $input.first().json;\nconst body = raw.body ?? raw;\nconst headers = raw.headers ?? {};\n\nconst receivedSig = (headers['x-akcc-signature'] ?? '').toString();\nif (!receivedSig) throw new Error('Missing X-AKCC-Signature header');\n\nconst bodyStr = JSON.stringify(body);\nconst expectedSig = 'sha256=' + crypto\n  .createHmac('sha256', secret)\n  .update(bodyStr)\n  .digest('hex');\n\n// Timing-safe comparison\nconst a = Buffer.from(receivedSig);\nconst b = Buffer.from(expectedSig);\nif (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {\n  throw new Error('Invalid signature — request rejected');\n}\n\n// Replay protection: reject events older than 5 minutes\nconst ts = new Date(body.timestamp);\nif (isNaN(ts.getTime()) || Math.abs(Date.now() - ts.getTime()) > 5 * 60 * 1000) {\n  throw new Error('Stale timestamp — possible replay attack');\n}\n\nif (body.event !== 'member.signup') {\n  throw new Error('Unexpected event: ' + body.event);\n}\n\n// HTML-escape user-controlled values before they reach email templates.\nfunction escHtml(s) {\n  return String(s || '')\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;');\n}\n\nreturn [{\n  json: {\n    event: body.event,\n    ts: body.timestamp,\n    // raw fields — use for API params (e.g. Resend 'to:')\n    email: body.data.email,\n    userId: body.data.userId,\n    // html-safe fields — use inside HTML email bodies\n    fullNameHtml: escHtml(body.data.fullName),\n    emailHtml: escHtml(body.data.email),\n  }\n}];"
+      }
+    },
+    {
+      "id": "44444444-4444-4444-4444-444444444444",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.RESEND_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ from: $env.N8N_FROM_EMAIL, to: $json.email, subject: 'Welcome to AKCC', html: '<table style=\"font-family:sans-serif;max-width:560px;margin:auto;padding:24px;background:#F2F7FB\"><tr><td style=\"background:#ffffff;border-radius:12px;padding:24px\"><h1 style=\"color:#2479C2;font-size:20px;margin:0 0 16px\">Welcome to AKCC!</h1><p style=\"color:#45596B;font-size:14px\">Hi ' + $json.fullNameHtml + ',</p><p style=\"color:#45596B;font-size:14px\">We are so glad you have joined the Australian Kachin Christian Church community. You can now access sermons, events, and more.</p><p style=\"color:#45596B;font-size:14px\">We look forward to worshipping with you.</p><hr style=\"border:none;border-top:1px solid #DCE7F0;margin:20px 0\"/><p style=\"font-size:11px;color:#8194A6;text-align:center\">Australian Kachin Christian Church</p></td></tr></table>' }) }}"
+      }
+    },
+    {
+      "id": "55555555-5555-5555-5555-555555555555",
+      "name": "Notify Admin of New Member",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.RESEND_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ from: $env.N8N_FROM_EMAIL, to: $env.ADMIN_EMAIL, subject: 'New Member: ' + $json.fullNameHtml, html: '<p style=\"font-family:sans-serif;color:#173A5E\">A new member has signed up:</p><table style=\"font-family:sans-serif;width:100%;border-collapse:collapse\"><tr><td style=\"padding:6px 0;color:#8194A6;width:80px\">Name</td><td style=\"color:#173A5E\">' + $json.fullNameHtml + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">Email</td><td style=\"color:#173A5E\">' + $json.emailHtml + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">User ID</td><td style=\"font-size:12px;color:#8194A6\">' + $json.userId + '</td></tr></table>' }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "On AKCC Webhook": {
+      "main": [
+        [{ "node": "Verify Signature + Extract", "type": "main", "index": 0 }]
+      ]
+    },
+    "Verify Signature + Extract": {
+      "main": [
+        [
+          { "node": "Send Welcome Email", "type": "main", "index": 0 },
+          { "node": "Notify Admin of New Member", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "notes": "Import into n8n, then: (1) activate the workflow, (2) ensure N8N_WEBHOOK_SECRET / RESEND_API_KEY / N8N_FROM_EMAIL / ADMIN_EMAIL are set in deploy/n8n/.env, (3) set N8N_WEBHOOK_URL in Vercel to https://<your-n8n-domain>/webhook/akcc"
+  }
+}
