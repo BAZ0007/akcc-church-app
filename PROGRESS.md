@@ -6,56 +6,28 @@
 ---
 
 ## Day 1 — Trigger.dev Setup ✅
-
-### What shipped
-- Installed `@trigger.dev/sdk` v4.4.6 (Trigger.dev v3 platform)
-- `trigger.config.ts` at repo root — project ref placeholder, `src/trigger/` dir registered
-- `src/trigger/hello-world.ts` — trivial test task (`hello-world`)
-- `.env.local.example` updated with `TRIGGER_SECRET_KEY` + `TRIGGER_PROJECT_REF`
-- `package.json` scripts added: `trigger:dev`, `trigger:deploy`
-
-### ⛔ Still needed
-- Trigger.dev **Project Ref** → paste into `trigger.config.ts` line 4
-- Trigger.dev **Secret Key** → add to `.env.local` + Vercel + Trigger.dev env vars
-
----
+- `@trigger.dev/sdk` v4.4.6, `trigger.config.ts`, `src/trigger/hello-world.ts`, npm scripts
+- ⛔ Need: project ref → `trigger.config.ts`; secret key → `.env.local` + Vercel + Trigger.dev env vars
 
 ## Day 2 — `event-reminder` ✅
-
-### What shipped
-- `resend` v6 installed
-- Migration `20240101000004_event_reminder.sql` — `reminder_sent_at` + partial index on `events`
-- `src/lib/email.ts` — server-only Resend singleton
-- `src/trigger/event-reminder.ts` — hourly cron (Melbourne TZ), 23-25h window, idempotency guard, HTML-escaped, 3 retries
-
-### ⛔ Still needed
-- Resend account + verified domain → `RESEND_API_KEY` + `RESEND_FROM_EMAIL` in `.env.local`, Vercel, Trigger.dev env vars
-- Run migration in Supabase
-
----
+- Migration: `reminder_sent_at` on events · `src/lib/email.ts` · `src/trigger/event-reminder.ts` (hourly Melbourne cron, 23-25h window, idempotency, batch Resend, 3 retries)
+- ⛔ Need: `RESEND_API_KEY`, `RESEND_FROM_EMAIL`; run migration in Supabase
 
 ## Day 3 — `giving-statement` ✅
+- `pdfkit` · `src/trigger/giving-statement.ts` (PDF → Resend attachment, service role) · `/api/admin/giving/statement` · `/admin/giving` page with two-step confirm
 
-### What shipped
-- `pdfkit` installed (+ `@types/pdfkit`)
-- `src/trigger/giving-statement.ts` — on-demand task
-  - Fetches completed givings for a member+year (service role)
-  - Generates A4 PDF with donation table + totals (pdfkit)
-  - Emails PDF attachment via Resend; 3 retries
-  - HTML-escapes member name in email body
-- `src/app/api/admin/giving/statement/route.ts` — admin-only POST; validates userId+year, triggers task
-- `src/app/admin/giving/page.tsx` — admin RSC; fetches member list from profiles
-- `src/app/admin/giving/_components/StatementForm.tsx` — client form: year + member selectors, two-step confirm before send
-- `src/app/admin/layout.tsx` — added "Giving Statements" nav link
-- `src/i18n/dictionaries/en.json` — added giving statement + common.confirm keys
+## Day 4 — `prayer-notify` ✅
+- Migration: `prayer_requests` table + RLS (anon insert, public wall, admin all)
+- `src/trigger/prayer-notify.ts` (admin email alert, 3 retries)
+- `/api/prayer` POST + GET · real prayer page + form + public wall
+- `src/lib/email.ts` exports `ADMIN_EMAIL`
+- ⛔ Need: `ADMIN_EMAIL` in env vars
+
+## Day 5 — `weekly-digest` ✅
+- Migration: `digest_subscribed BOOLEAN DEFAULT TRUE` on profiles
+- `src/trigger/weekly-digest.ts`: Sunday 8am Melbourne cron; fetches subscribed members, week's sermons, 14-day events; HTML digest email; Resend batch (50/batch); skips if no content
 
 ---
-
-## Day 4 — `prayer-notify` ⏭️
-Trigger.dev task fired from prayer-create API → email admin when new prayer request arrives.
-
-## Day 5 — `weekly-digest` ⏭️
-Sunday AM Melbourne cron → email subscribed members week's sermons + events.
 
 ## Day 6 — n8n infra on DigitalOcean ⏭️
 `deploy/n8n/` docker-compose + Caddy + README.
