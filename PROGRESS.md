@@ -37,12 +37,15 @@
 - ⛔ Need: create $6/mo DO droplet (Ubuntu 24.04, Sydney), point DNS A record, `cp .env.example .env` + fill all CHANGE_ME values, `docker compose up -d`
 - ⛔ Need: add `N8N_WEBHOOK_SECRET` to Vercel env vars (same value as in .env)
 
-## Day 7 — Signed event emitter ⏭️
-Thin HMAC helper (`src/lib/n8n.ts`) to POST signed events to n8n webhook.
-`N8N_WEBHOOK_URL` + `N8N_WEBHOOK_SECRET` env vars; HMAC-SHA256 `X-AKCC-Signature` header.
+## Day 7 — Signed event emitter ✅
+- `src/lib/n8n.ts`: server-only `emitToN8n(event, data)` — HMAC-SHA256 signs full JSON body, adds `X-AKCC-Signature: sha256=<hex>` header
+- Graceful no-op if `N8N_WEBHOOK_URL` not set; throws if URL set but secret missing
+- `.env.local.example` updated with `N8N_WEBHOOK_URL` + `N8N_WEBHOOK_SECRET`
+- ⛔ Need: add both vars to `.env.local`, Vercel env vars
 
 ## Day 8 — Workflow 1: member signup ⏭️
-n8n workflow JSON: new signup → welcome email + ping admin.
+Call `emitToN8n("member.signup", {...})` from the signup API route.
+n8n workflow JSON exported to `deploy/n8n/workflows/member-signup.json`.
 
 ## Day 9 — Workflows 2 & 3 ⏭️
 Volunteer roster + weekly giving summary workflows.
