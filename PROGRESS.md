@@ -29,11 +29,17 @@
 
 ---
 
-## Day 6 — n8n infra on DigitalOcean ⏭️
-`deploy/n8n/` docker-compose + Caddy + README.
+## Day 6 — n8n infra on DigitalOcean ✅
+- `deploy/n8n/docker-compose.yml`: n8n + Postgres + Caddy (auto-HTTPS), internal network only
+- `deploy/n8n/Caddyfile`: reverse proxy, TLS via `{$N8N_DOMAIN}`
+- `deploy/n8n/.env.example`: N8N_DOMAIN, POSTGRES_PASSWORD, basic-auth creds, encryption key, N8N_WEBHOOK_SECRET
+- `deploy/n8n/README.md`: step-by-step DO droplet → DNS → Docker → compose up → lock first login
+- ⛔ Need: create $6/mo DO droplet (Ubuntu 24.04, Sydney), point DNS A record, `cp .env.example .env` + fill all CHANGE_ME values, `docker compose up -d`
+- ⛔ Need: add `N8N_WEBHOOK_SECRET` to Vercel env vars (same value as in .env)
 
 ## Day 7 — Signed event emitter ⏭️
-Thin HMAC helper to POST signed events to n8n webhook.
+Thin HMAC helper (`src/lib/n8n.ts`) to POST signed events to n8n webhook.
+`N8N_WEBHOOK_URL` + `N8N_WEBHOOK_SECRET` env vars; HMAC-SHA256 `X-AKCC-Signature` header.
 
 ## Day 8 — Workflow 1: member signup ⏭️
 n8n workflow JSON: new signup → welcome email + ping admin.
