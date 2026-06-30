@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createRsvpSchema } from "@/lib/validation/events";
 import { isValidUUID } from "@/lib/validation/uuid";
 import { NextRequest, NextResponse } from "next/server";
+import { emitToN8n } from "@/lib/n8n";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   // Verify the event exists and is published (members cannot RSVP to hidden events)
   const { data: event } = await supabase
     .from("events")
-    .select("id, published, capacity, starts_at")
+    .select("id, title, published, capacity, starts_at")
     .eq("id", eventId)
     .single();
 
@@ -93,6 +94,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   if (error) {
     console.error("[POST /api/events/[id]/rsvp]", error.message);
     return NextResponse.json({ error: "Failed to save RSVP" }, { status: 500 });
+  }
+
+  // Fire-and-forget: notify n8n of confirmed RSVP
+  if (input.status === "attending") {
+    emitToN8n("event.rsvp", {
+      eventId,
+      eventTitle: event.title,
+      eventDate: event.starts_at,
+      userId: user.id,
+      userEmail: user.email ?? "",
+      status: input.status,
+      guestCount: input.guest_count,
+    }).catch((err: unknown) => {
+      console.error("[POST /api/events/[id]/rsvp] event.rsvp emit failed:", err);
+    });
   }
 
   return NextResponse.json(data, { status: 200 });

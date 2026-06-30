@@ -1,0 +1,95 @@
+{
+  "name": "AKCC — Giving Received",
+  "nodes": [
+    {
+      "id": "11111111-aaaa-aaaa-aaaa-111111111111",
+      "name": "On AKCC Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "akcc",
+        "responseMode": "onReceived",
+        "responseData": "noData",
+        "options": {
+          "includeHeaders": true
+        }
+      },
+      "webhookId": "22222222-bbbb-bbbb-bbbb-222222222222"
+    },
+    {
+      "id": "33333333-cccc-cccc-cccc-333333333333",
+      "name": "Verify Signature + Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const crypto = require('crypto');\n\nconst secret = $env.N8N_WEBHOOK_SECRET;\nif (!secret) throw new Error('N8N_WEBHOOK_SECRET env var is not set');\n\nconst raw = $input.first().json;\nconst body = raw.body ?? raw;\nconst headers = raw.headers ?? {};\n\nconst receivedSig = (headers['x-akcc-signature'] ?? '').toString();\nif (!receivedSig) throw new Error('Missing X-AKCC-Signature header');\n\nconst bodyStr = JSON.stringify(body);\nconst expectedSig = 'sha256=' + crypto\n  .createHmac('sha256', secret)\n  .update(bodyStr)\n  .digest('hex');\n\nconst a = Buffer.from(receivedSig);\nconst b = Buffer.from(expectedSig);\nif (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {\n  throw new Error('Invalid signature — request rejected');\n}\n\nconst ts = new Date(body.timestamp);\nif (isNaN(ts.getTime()) || Math.abs(Date.now() - ts.getTime()) > 5 * 60 * 1000) {\n  throw new Error('Stale timestamp — possible replay attack');\n}\n\nif (body.event !== 'giving.received') {\n  throw new Error('Unexpected event: ' + body.event);\n}\n\nfunction escHtml(s) {\n  return String(s || '')\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;');\n}\n\nconst d = body.data;\nconst amountStr = ((d.amountCents || 0) / 100).toFixed(2);\nconst fundLabel = { general: 'General Fund', building: 'Building Fund', missions: 'Missions' }[d.fund] || escHtml(d.fund);\n\nreturn [{\n  json: {\n    event: body.event,\n    donorEmail: d.donorEmail,\n    sessionId: d.sessionId,\n    amountDisplay: d.currency + ' $' + amountStr,\n    fundLabel,\n    donorNameHtml: escHtml(d.donorName || 'Anonymous'),\n    donorEmailHtml: escHtml(d.donorEmail),\n  }\n}];"
+      }
+    },
+    {
+      "id": "44444444-dddd-dddd-dddd-444444444444",
+      "name": "Send Donor Thank-You",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.RESEND_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ from: $env.N8N_FROM_EMAIL, to: $json.donorEmail, subject: 'Thank you for your giving — AKCC', html: '<table style=\"font-family:sans-serif;max-width:560px;margin:auto;padding:24px;background:#F2F7FB\"><tr><td style=\"background:#ffffff;border-radius:12px;padding:24px\"><h1 style=\"color:#2479C2;font-size:20px;margin:0 0 16px\">Thank you for your generosity!</h1><p style=\"color:#45596B;font-size:14px\">Dear ' + $json.donorNameHtml + ',</p><p style=\"color:#45596B;font-size:14px\">Your gift to AKCC has been received. Your generosity helps us serve the Kachin community and advance the Kingdom of God.</p><div style=\"border-left:3px solid #E0A03A;padding:8px 12px;margin:16px 0\"><p style=\"margin:0;font-weight:bold;color:#173A5E\">' + $json.amountDisplay + '</p><p style=\"margin:4px 0 0;font-size:13px;color:#45596B\">' + $json.fundLabel + '</p></div><p style=\"font-size:13px;color:#45596B\">A giving statement is available on request from the church admin.</p><hr style=\"border:none;border-top:1px solid #DCE7F0;margin:20px 0\"/><p style=\"font-size:11px;color:#8194A6;text-align:center\">Australian Kachin Christian Church · ABN 00 000 000 000</p></td></tr></table>' }) }}"
+      }
+    },
+    {
+      "id": "55555555-eeee-eeee-eeee-555555555555",
+      "name": "Notify Admin of Giving",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 420],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.RESEND_API_KEY}}" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ from: $env.N8N_FROM_EMAIL, to: $env.ADMIN_EMAIL, subject: 'Giving Received: ' + $json.amountDisplay, html: '<p style=\"font-family:sans-serif;color:#173A5E\">A new gift has been received:</p><table style=\"font-family:sans-serif;width:100%;border-collapse:collapse\"><tr><td style=\"padding:6px 0;color:#8194A6;width:100px\">Donor</td><td style=\"color:#173A5E\">' + $json.donorNameHtml + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">Email</td><td style=\"color:#173A5E\">' + $json.donorEmailHtml + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">Amount</td><td style=\"color:#173A5E;font-weight:bold\">' + $json.amountDisplay + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">Fund</td><td style=\"color:#173A5E\">' + $json.fundLabel + '</td></tr><tr><td style=\"padding:6px 0;color:#8194A6\">Session</td><td style=\"font-size:11px;color:#8194A6\">' + $json.sessionId + '</td></tr></table>' }) }}"
+      }
+    }
+  ],
+  "connections": {
+    "On AKCC Webhook": {
+      "main": [
+        [{ "node": "Verify Signature + Extract", "type": "main", "index": 0 }]
+      ]
+    },
+    "Verify Signature + Extract": {
+      "main": [
+        [
+          { "node": "Send Donor Thank-You", "type": "main", "index": 0 },
+          { "node": "Notify Admin of Giving", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "notes": "Triggered by Stripe checkout.session.completed via POST /api/webhooks/stripe. Sends thank-you to donor + admin notification. Requires: N8N_WEBHOOK_SECRET, RESEND_API_KEY, N8N_FROM_EMAIL, ADMIN_EMAIL in deploy/n8n/.env. Also add STRIPE_WEBHOOK_SECRET to Vercel env vars and register the webhook in Stripe dashboard → Developers → Webhooks → endpoint: https://<app-url>/api/webhooks/stripe, event: checkout.session.completed."
+  }
+}

@@ -50,8 +50,13 @@
 - `deploy/n8n/.env.example`: added `RESEND_API_KEY`, `N8N_FROM_EMAIL`, `ADMIN_EMAIL` for workflow use
 - ⛔ Need: import `member-signup.json` into n8n, activate workflow, set `N8N_WEBHOOK_URL=https://<n8n-domain>/webhook/akcc` in Vercel
 
-## Day 9 — Workflows 2 & 3 ⏭️
-Volunteer roster + weekly giving summary workflows.
+## Day 9 — Workflows 2 & 3 ✅
+- `src/app/api/events/[id]/rsvp/route.ts`: fire-and-forget `emitToN8n("event.rsvp", {...})` on attending RSVP; added `title` to event select
+- `src/app/api/webhooks/stripe/route.ts`: NEW — verifies Stripe signature via `stripe.webhooks.constructEvent(rawBody, sig, secret)`; emits `giving.received` on `checkout.session.completed`
+- `deploy/n8n/workflows/event-rsvp.json`: RSVP confirmation email to member
+- `deploy/n8n/workflows/giving-received.json`: donor thank-you + admin notification (parallel)
+- Migration `20240101000007`: adds `"givings: owner can read own"` RLS policy (pre-existing gap — donors couldn't read their own giving history)
+- ⛔ Need: run migration in Supabase; register Stripe webhook in dashboard → endpoint `/api/webhooks/stripe`, event `checkout.session.completed`; add `STRIPE_WEBHOOK_SECRET` to Vercel
 
 ## Day 10 — QA + docs ⏭️
 Exercise all jobs/flows end-to-end, write `docs/automation.md`.
