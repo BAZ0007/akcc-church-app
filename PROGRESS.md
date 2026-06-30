@@ -58,5 +58,9 @@
 - Migration `20240101000007`: adds `"givings: owner can read own"` RLS policy (pre-existing gap — donors couldn't read their own giving history)
 - ⛔ Need: run migration in Supabase; register Stripe webhook in dashboard → endpoint `/api/webhooks/stripe`, event `checkout.session.completed`; add `STRIPE_WEBHOOK_SECRET` to Vercel
 
-## Day 10 — QA + docs ⏭️
-Exercise all jobs/flows end-to-end, write `docs/automation.md`.
+## Day 10 — QA + docs ✅
+- `npx tsc --noEmit` — zero errors across all new code
+- `npm run build` — production build passes (fixed Stripe client build-time init)
+- All n8n workflow JSONs valid (node -e JSON.parse check)
+- `src/lib/stripe/server.ts`: `||` fallback prevents constructor throw during build when STRIPE_SECRET_KEY absent
+- `docs/automation.md`: full reference — architecture, all tasks/workflows, env var table, setup checklist, troubleshooting
