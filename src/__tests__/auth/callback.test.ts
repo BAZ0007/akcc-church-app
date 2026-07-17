@@ -1,4 +1,6 @@
 /**
+ * @jest-environment node
+ *
  * Tests for GET /auth/callback — open-redirect prevention.
  *
  * Strategy: mock next/server so we can use real NextRequest/NextResponse-like
@@ -14,6 +16,7 @@ jest.mock("@/lib/supabase/server", () => ({
       exchangeCodeForSession: jest
         .fn()
         .mockResolvedValue({ error: null }),
+      getUser: jest.fn().mockResolvedValue({ data: { user: null } }),
     },
   }),
 }));
