@@ -8,7 +8,10 @@
     "admin": "Admin",
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "about": "About",
+    "help": "Help",
+    "skipToContent": "Skip to main content"
   },
   "home": {
     "heroTitle": "Welcome to AKCC",
@@ -157,5 +160,222 @@
     "installPrompt": "Install the AKCC app on your phone for quick access.",
     "install": "Install",
     "dismiss": "Not now"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Who we are and when we gather",
+    "welcome": "Welcome to the Australian Kachin Christian Church (AKCC) — a community of Kachin Christians in Australia, worshipping together in faith, culture, and fellowship. Wherever you are on your journey, there is a place for you here.",
+    "ourStory": "Our Story",
+    "ourStoryBody": "AKCC was founded to serve Kachin families who have made Australia their home, offering a place to worship in a familiar language and culture while building a life in a new country. We are a family church — young and old, newcomers and long-settled — united by the gospel of Jesus Christ.",
+    "whatWeBelieve": "What We Believe",
+    "beliefsIntro": "We are an evangelical Christian church. In short, we believe:",
+    "beliefs": [
+      "In one God — Father, Son, and Holy Spirit.",
+      "That the Bible is the inspired Word of God and our guide for life.",
+      "That salvation is a gift of grace through faith in Jesus Christ.",
+      "That the Church is a family called to love God and love our neighbour."
+    ],
+    "serviceTimes": "Service Times",
+    "serviceTimesNote": "Join us in person or online — all are welcome.",
+    "sundayService": "Sunday Worship",
+    "sundayServiceTime": "[Add service time — e.g. Sundays 10:00 AM]",
+    "prayerMeeting": "Prayer & Fellowship",
+    "prayerMeetingTime": "[Add meeting time — e.g. Wednesdays 7:00 PM]",
+    "location": "Where to Find Us",
+    "address": "[Add church address — street, suburb, state, postcode]",
+    "getDirections": "Get Directions",
+    "contactHeading": "Contact Us",
+    "contactNote": "Questions, pastoral care, or just want to say hello? Reach out — we'd love to hear from you.",
+    "emailLabel": "Email",
+    "email": "[Add contact email]",
+    "phoneLabel": "Phone",
+    "phone": "[Add phone number]",
+    "adminNote": "Church leaders: edit these details in the text at src/i18n/dictionaries/en.json (the values in square brackets)."
+  },
+  "help": {
+    "title": "Help & FAQ",
+    "subtitle": "Answers to common questions about our church and this app",
+    "faqs": [
+      {
+        "q": "Do I need an account to use the app?",
+        "a": "No. Anyone can browse sermons, events, and announcements, and submit a prayer request without signing in. You only need a free account to RSVP to events and to give online."
+      },
+      {
+        "q": "How do I RSVP to an event?",
+        "a": "Open the Events tab, choose an event, and tap RSVP. You'll need to be signed in so we can save your registration."
+      },
+      {
+        "q": "How do I install the app on my phone?",
+        "a": "On an iPhone, open the site in Safari, tap the Share button, then 'Add to Home Screen'. On Android, open it in Chrome and tap 'Install app' when prompted, or choose 'Add to Home Screen' from the menu."
+      },
+      {
+        "q": "Is my prayer request private?",
+        "a": "You choose. When you submit a request you can either share it on the public prayer wall or keep it private so only the pastoral team can see it."
+      },
+      {
+        "q": "How is my personal information handled?",
+        "a": "We only collect what we need to run the church community, and we never sell your data. See our Privacy Policy for the full details."
+      },
+      {
+        "q": "How do I update or delete my account?",
+        "a": "You can manage your details on your Profile page once signed in. To delete your account and data, contact us and we'll take care of it."
+      }
+    ],
+    "stillNeedHelp": "Still need help?",
+    "contactSupport": "If you can't find what you're looking for, get in touch and we'll be glad to help.",
+    "contactButton": "Contact Us"
+  },
+  "legal": {
+    "templateNotice": "This is a general template provided for a community church and is not legal advice. Church leaders should have it reviewed to ensure it reflects your actual practices and meets current Australian legal requirements.",
+    "backToAbout": "Back to About"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "How we collect, use, and protect your information",
+    "lastUpdated": "Last updated: [Add date]",
+    "intro": "The Australian Kachin Christian Church (\"AKCC\", \"we\", \"us\") respects your privacy. This policy explains what personal information we collect through this app and website, why we collect it, and how we look after it. We handle personal information in line with the Australian Privacy Principles under the Privacy Act 1988 (Cth).",
+    "sections": [
+      {
+        "heading": "What we collect",
+        "body": [
+          "Account details you provide when you sign up, such as your name and email address.",
+          "Event RSVPs and prayer requests you submit.",
+          "Giving records, where you choose to give online. Card payments are processed securely by Stripe — we never see or store your full card details.",
+          "Basic technical information your device sends automatically, such as your browser type, used to keep the app secure and working."
+        ]
+      },
+      {
+        "heading": "How we use it",
+        "body": [
+          "To run the life of the church: managing events, sending reminders, responding to prayer requests, and issuing giving receipts.",
+          "To communicate with you about church activities you have signed up for.",
+          "We do not sell your personal information, and we do not share it with third parties except the trusted services that help us run the app (such as our hosting, email, and payment providers), or where required by law."
+        ]
+      },
+      {
+        "heading": "How we protect it",
+        "body": [
+          "Access to personal information is restricted to authorised church administrators.",
+          "Our database enforces row-level security so members can only see their own private data.",
+          "Payment card data is handled entirely by Stripe, a certified payment provider."
+        ]
+      },
+      {
+        "heading": "Your choices and rights",
+        "body": [
+          "You can access or correct your information from your Profile page, or by contacting us.",
+          "You can ask us to delete your account and associated personal data at any time.",
+          "You can opt out of non-essential emails, such as the weekly digest, at any time."
+        ]
+      },
+      {
+        "heading": "Children's privacy",
+        "body": [
+          "We take the safety of children seriously. We do not knowingly collect personal information from children without the consent of a parent or guardian. Please also read our Child Safeguarding statement."
+        ]
+      },
+      {
+        "heading": "Contact us",
+        "body": [
+          "If you have any questions about this policy or your information, please contact us at [Add contact email]."
+        ]
+      }
+    ]
+  },
+  "safeguarding": {
+    "title": "Child Safeguarding",
+    "subtitle": "Our commitment to keeping children and young people safe",
+    "lastUpdated": "Last updated: [Add date]",
+    "intro": "The Australian Kachin Christian Church is committed to the care, safety, and wellbeing of all children and young people in our community. We have zero tolerance for child abuse and are committed to acting in the best interests of children in all that we do.",
+    "sections": [
+      {
+        "heading": "Our commitment",
+        "body": [
+          "Every child has the right to feel safe and be safe. The wellbeing of children in our care is always our first priority.",
+          "We take a preventative, proactive, and participatory approach to child safety, in keeping with the National Principles for Child Safe Organisations."
+        ]
+      },
+      {
+        "heading": "What we do",
+        "body": [
+          "Anyone working with children in our church — staff or volunteer — is required to hold a current Working With Children Check as required by their state or territory.",
+          "We follow clear codes of conduct for how adults interact with children during church activities.",
+          "Concerns and reports are taken seriously, responded to promptly, and recorded appropriately."
+        ]
+      },
+      {
+        "heading": "Data and this app",
+        "body": [
+          "We do not collect personal information about minors through this app without the explicit consent of a parent or guardian and an appropriate safeguarding review.",
+          "Where children take part in church activities, their information is handled by church leaders offline, not stored in public parts of this app."
+        ]
+      },
+      {
+        "heading": "Raising a concern",
+        "body": [
+          "If you have a concern about the safety of a child in our community, please contact our child safety officer at [Add child-safety contact email/phone].",
+          "If a child is in immediate danger, always call 000 (emergency services) first."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "subtitle": "The terms for using this app and website",
+    "lastUpdated": "Last updated: [Add date]",
+    "intro": "By using the AKCC app and website, you agree to these terms. Please read them carefully.",
+    "sections": [
+      {
+        "heading": "Using this app",
+        "body": [
+          "This app is provided for the members and friends of the Australian Kachin Christian Church to stay connected with the life of the church.",
+          "You agree to use it respectfully and lawfully, and not to misuse it, disrupt it, or attempt to access areas you are not authorised to use."
+        ]
+      },
+      {
+        "heading": "Your account",
+        "body": [
+          "You are responsible for keeping your login details secure and for activity that happens under your account.",
+          "Please let us know promptly if you believe your account has been accessed without your permission."
+        ]
+      },
+      {
+        "heading": "Content you submit",
+        "body": [
+          "When you submit content such as a prayer request, you are responsible for what you share. Please be respectful and do not post anything unlawful, harmful, or that infringes the rights of others.",
+          "We may remove content that is inappropriate or that breaches these terms."
+        ]
+      },
+      {
+        "heading": "Giving",
+        "body": [
+          "Online gifts are processed securely through Stripe. Gifts to the church are generally non-refundable; if you believe a gift was made in error, please contact us."
+        ]
+      },
+      {
+        "heading": "Availability",
+        "body": [
+          "We aim to keep the app available and accurate, but we provide it \"as is\" and cannot guarantee it will always be uninterrupted or error-free."
+        ]
+      },
+      {
+        "heading": "Contact",
+        "body": [
+          "Questions about these terms? Contact us at [Add contact email]."
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "tagline": "A church family in Australia, rooted in Kachin heritage and the gospel of Jesus Christ.",
+    "explore": "Explore",
+    "aboutUs": "About Us",
+    "helpFaq": "Help & FAQ",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "safeguarding": "Child Safeguarding",
+    "terms": "Terms of Use",
+    "rights": "All rights reserved.",
+    "acknowledgement": "We acknowledge the Traditional Custodians of the land on which we gather, and pay our respects to Elders past and present."
   }
 }

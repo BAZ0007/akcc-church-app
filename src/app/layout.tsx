@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AppBar } from "@/components/layout/AppBar";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { Footer } from "@/components/layout/Footer";
 import { getDictionary } from "@/i18n/getDictionary";
 
 export const metadata: Metadata = {
@@ -35,7 +36,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="min-h-screen bg-[var(--bg)]">
+      <body className="min-h-screen bg-[var(--bg)] flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:rounded-[var(--r-md)] focus:bg-[var(--primary)] focus:px-4 focus:py-2 focus:text-white focus:font-medium"
+        >
+          {t.nav.skipToContent}
+        </a>
         <AppBar
           labels={{
             appName: t.common.appName,
@@ -52,9 +59,10 @@ export default async function RootLayout({
             kachinComingSoon: t.common.kachinComingSoon,
           }}
         />
-        <div id="main-content" className="pb-16 md:pb-0">
+        <div id="main-content" tabIndex={-1} className="flex-1 pb-16 md:pb-0 outline-none">
           {children}
         </div>
+        <Footer />
         <BottomNav
           labels={{
             home: t.nav.home,
