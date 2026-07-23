@@ -16,9 +16,9 @@ const isDev = process.env.NODE_ENV === "development";
 const csp = [
   `default-src 'self'`,
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://js.stripe.com`,
-  `style-src 'self' 'unsafe-inline'`,
+  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
   `img-src 'self' data: blob: https://*.supabase.co https://img.youtube.com https://i.ytimg.com`,
-  `font-src 'self' data:`,
+  `font-src 'self' data: https://fonts.gstatic.com`,
   `frame-src https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://web.facebook.com https://js.stripe.com https://hooks.stripe.com`,
   `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com`,
   `form-action 'self' https://checkout.stripe.com`,
